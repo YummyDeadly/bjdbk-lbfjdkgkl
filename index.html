@@ -1,63 +1,48 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-  <title>Рулетка</title>
+  <meta charset="UTF-8">
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
-    body{margin:0;font-family:Arial;background:#111;color:#fff;text-align:center;padding:20px}
-    #wheel{width:200px;height:200px;border-radius:50%;border:6px solid gold;margin:20px auto;
-           background:conic-gradient(#e74c3c 0 36deg,#f1c40f 36 72deg,#2ecc71 72 108deg,
-                                     #3498db 108 144deg,#9b59b6 144 180deg,#e74c3c 180 216deg,
-                                     #f1c40f 216 252deg,#2ecc71 252 288deg,#3498db 288 324deg,
-                                     #9b59b6 324 360deg);
-           transition:transform 4s cubic-bezier(.2,.8,.2,1);}
-    button{padding:10px 20px;font-size:16px;margin:10px 5px;border:none;border-radius:8px;background:#0099ff;color:#fff}
-    #balance{margin:15px;font-size:18px}
+    :root{--gold:#ffd700;--bg:#0f0f11;--accent:#0099ff}
+    body{margin:0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif;background:var(--bg);color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh}
+    #wheel{position:relative;width:220px;height:220px;border-radius:50%;border:8px solid var(--gold);background:conic-gradient(#e74c3c 0 36deg,#f1c40f 36 72deg,#2ecc71 72 108deg,#3498db 108 144deg,#9b59b6 144 180deg,#e74c3c 180 216deg,#f1c40f 216 252deg,#2ecc71 252 288deg,#3498db 288 324deg,#9b59b6 324 360deg);transition:transform 3.5s cubic-bezier(.2,.8,.2,1)}
+    button{background:var(--accent);border:none;border-radius:12px;padding:12px 28px;font-size:16px;color:#fff;cursor:pointer;margin:10px}
+    input{width:70px;text-align:center;font-size:18px;border-radius:8px;border:1px solid var(--accent);margin:0 6px}
+    #bal{margin-bottom:15px;font-size:20px}
+    #msg{margin-top:15px;font-size:16px}
   </style>
 </head>
 <body>
-  <h1>🎰 Рулетка</h1>
-  <div id="balance">Загрузка...</div>
+  <div id="bal">Загрузка…</div>
   <div id="wheel"></div>
   <div>
-    <input id="bet" type="number" min="10" step="10" value="10" style="width:80px"/>
-    <input id="sector" type="number" min="1" max="10" value="5" style="width:50px"/>
-    <button onclick="spin()">Крутить</button>
+    <input id="bet" type="number" min="10" step="10" value="10">
+    <input id="sector" type="number" min="1" max="10" value="5">
   </div>
+  <button onclick="spin()">Крутить</button>
   <div id="msg"></div>
 
 <script>
-const uid = new URLSearchParams(location.search).get('uid');
-let balance = 0;
+const uid = Telegram.WebApp.initDataUnsafe.user?.id;
+const api = (path,data)=>fetch(path,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)}).then(r=>r.json());
 
-async function api(path, data) {
-  const r = await fetch(path, {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(data)});
-  return r.json();
+async function loadBal(){
+  const res=await api('/balance',{user_id:uid});
+  document.getElementById('bal').innerText='Баланс: '+(res.balance||0)+' ⭐';
 }
-
-async function loadBalance() {
-  const res = await api('/balance', {user_id: uid}); // можно добавить отдельный энд-поинт
-  balance = res.balance || 0;
-  document.getElementById('balance').innerText = `Баланс: ${balance} ⭐`;
+async function spin(){
+  const bet=+document.getElementById('bet').value;
+  const sector=+document.getElementById('sector').value;
+  const res=await api('/spin',{user_id:uid,bet,sector});
+  if(res.error){Telegram.WebApp.showAlert(res.error);return;}
+  loadBal();
+  const wheel=document.getElementById('wheel');
+  const deg=3600+(res.win?(sector-1)*36:Math.floor(Math.random()*10)*36);
+  wheel.style.transform=`rotate(${deg}deg)`;
+  document.getElementById('msg').innerText=res.message;
 }
-
-async function spin() {
-  const bet = +document.getElementById('bet').value;
-  const sector = +document.getElementById('sector').value;
-  if(bet < 10 || bet > balance) return alert('Ставка от 10 до текущего баланса');
-  const res = await api('/spin', {user_id: uid, bet, sector});
-  if(res.error) return alert(res.error);
-  balance = res.new_balance;
-  document.getElementById('balance').innerText = `Баланс: ${balance} ⭐`;
-  document.getElementById('msg').innerText = res.message;
-  // анимация
-  const wheel = document.getElementById('wheel');
-  const deg = 3600 + (res.win ? (sector-1)*36 : Math.floor(Math.random()*10)*36);
-  wheel.style.transform = `rotate(${deg}deg)`;
-}
-
-loadBalance();
+loadBal();
 </script>
 </body>
 </html>
