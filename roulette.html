@@ -1,48 +1,117 @@
-<!DOCTYPE html>
-<html lang="ru">
-<head>
-  <meta charset="UTF-8">
-  <script src="https://telegram.org/js/telegram-web-app.js"></script>
-  <style>
-    :root{--gold:#ffd700;--bg:#0f0f11;--accent:#0099ff}
-    body{margin:0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif;background:var(--bg);color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh}
-    #wheel{position:relative;width:220px;height:220px;border-radius:50%;border:8px solid var(--gold);background:conic-gradient(#e74c3c 0 36deg,#f1c40f 36 72deg,#2ecc71 72 108deg,#3498db 108 144deg,#9b59b6 144 180deg,#e74c3c 180 216deg,#f1c40f 216 252deg,#2ecc71 252 288deg,#3498db 288 324deg,#9b59b6 324 360deg);transition:transform 3.5s cubic-bezier(.2,.8,.2,1)}
-    button{background:var(--accent);border:none;border-radius:12px;padding:12px 28px;font-size:16px;color:#fff;cursor:pointer;margin:10px}
-    input{width:70px;text-align:center;font-size:18px;border-radius:8px;border:1px solid var(--accent);margin:0 6px}
-    #bal{margin-bottom:15px;font-size:20px}
-    #msg{margin-top:15px;font-size:16px}
-  </style>
-</head>
-<body>
-  <div id="bal">Загрузка…</div>
-  <div id="wheel"></div>
-  <div>
-    <input id="bet" type="number" min="10" step="10" value="10">
-    <input id="sector" type="number" min="1" max="10" value="5">
-  </div>
-  <button onclick="spin()">Крутить</button>
-  <div id="msg"></div>
-
-<script>
-const uid = Telegram.WebApp.initDataUnsafe.user?.id;
-const api = (path,data)=>fetch(path,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)}).then(r=>r.json());
-
-async function loadBal(){
-  const res=await api('/balance',{user_id:uid});
-  document.getElementById('bal').innerText='Баланс: '+(res.balance||0)+' ⭐';
-}
-async function spin(){
-  const bet=+document.getElementById('bet').value;
-  const sector=+document.getElementById('sector').value;
-  const res=await api('/spin',{user_id:uid,bet,sector});
-  if(res.error){Telegram.WebApp.showAlert(res.error);return;}
-  loadBal();
-  const wheel=document.getElementById('wheel');
-  const deg=3600+(res.win?(sector-1)*36:Math.floor(Math.random()*10)*36);
-  wheel.style.transform=`rotate(${deg}deg)`;
-  document.getElementById('msg').innerText=res.message;
-}
-loadBal();
-</script>
-</body>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<title>European roulete</title>
+		<link rel="stylesheet" href="inc/index.css" type="text/css" media="screen" charset="utf-8" />
+		<script language="javascript" src="inc/jquery-1.5.2.js"></script>
+		<script language="javascript" src="inc/index.js"></script>
+	</head>
+	<body>
+	<div class="container">
+		<div class="header">European Roulete</div>
+		<div><table  border="0" cellspacing="0" cellpadding="0">
+			<tr class="btns">
+				<td colspan="3">&nbsp;</td>
+				<td id="btn1"><div class="btn">&nbsp;</div>1</td>
+				<td id="btn2"><div class="btn">&nbsp;</div>2</td>
+				<td id="btn3"><div class="btn">&nbsp;</div>3</td>
+				<td id="btn4"><div class="btn">&nbsp;</div>4</td>
+				<td id="btn5"><div class="btn">&nbsp;</div>5</td>
+				<td id="btn6"><div class="btn">&nbsp;</div>6</td>
+				<td id="btn7"><div class="btn">&nbsp;</div>7</td>
+				<td id="btn8"><div class="btn">&nbsp;</div>8</td>
+				<td id="btn9"><div class="btn">&nbsp;</div>9</td>
+				<td id="btn10"><div class="btn">&nbsp;</div>10</td>
+				<td id="btn11"><div class="btn">&nbsp;</div>11</td>
+				<td id="btn12"><div class="btn">&nbsp;</div>12</td>
+				<td>&nbsp;</td>
+			</tr>
+			<tr>
+				<td rowspan="5"><img src="inc/circled.png" width="192" height="195" /></td>
+				<td class="zb" rowspan="5"><img src="inc/border.png" width="24" height="120" /></td>
+				<td rowspan="3"  id="zero"><div class="rot270">0</div></td>
+				<td id="cell3" class="red ftdo"><div class="rot270">3</div></td>
+				<td id="cell6" class="black ftdo"><div class="rot270">6</div></td>
+				<td id="cell9" class="red ftdo"><div class="rot270">9</div></td>
+				<td id="cell12" class="red ftdo"><div class="rot270">12</div></td>
+				<td id="cell15" class="black ftdo"><div class="rot270">15</div></td>
+				<td id="cell18" class="red ftdo"><div class="rot270">18</div></td>
+				<td id="cell21" class="red ftdo"><div class="rot270">21</div></td>
+				<td id="cell24" class="black ftdo"><div class="rot270">24</div></td>
+				<td id="cell27" class="red ftdo"><div class="rot270">27</div></td>
+				<td id="cell30" class="red ftdo"><div class="rot270">30</div></td>
+				<td id="cell33" class="black ftdo"><div class="rot270">33</div></td>
+				<td id="cell36" class="red ftdo"><div class="rot270">36</div></td>
+				<td class="le_1"><div class="rot270">2-1</div></td>
+			</tr>
+			<tr>
+				<td id="cell2" class="black"><div class="rot270">2</div></td>
+				<td id="cell5" class="red"><div class="rot270">5</div></td>
+				<td id="cell8" class="black"><div class="rot270">8</div></td>
+				<td id="cell11" class="black"><div class="rot270">11</div></td>
+				<td id="cell14" class="red"><div class="rot270">14</div></td>
+				<td id="cell17" class="black"><div class="rot270">17</div></td>
+				<td id="cell20" class="black"><div class="rot270">20</div></td>
+				<td id="cell23" class="red"><div class="rot270">23</div></td>
+				<td id="cell26" class="black"><div class="rot270">26</div></td>
+				<td id="cell29" class="black"><div class="rot270">29</div></td>
+				<td id="cell32" class="red"><div class="rot270">32</div></td>
+				<td id="cell35" class="black"><div class="rot270">35</div></td>
+				<td class="le"><div class="rot270">2-1</div></td>
+			</tr>
+			<tr>
+				<td id="cell1" class="red"><div class="rot270">1</div></td>
+				<td id="cell4" class="black"><div class="rot270">4</div></td>
+				<td id="cell7" class="red"><div class="rot270">7</div></td>
+				<td id="cell10" class="black"><div class="rot270">10</div></td>
+				<td id="cell13" class="black"><div class="rot270">13</div></td>
+				<td id="cell16" class="red"><div class="rot270">16</div></td>
+				<td id="cell19" class="black"><div class="rot270">19</div></td>
+				<td id="cell22" class="black"><div class="rot270">22</div></td>
+				<td id="cell25" class="red"><div class="rot270">25</div></td>
+				<td id="cell28" class="red"><div class="rot270">28</div></td>
+				<td id="cell31" class="black"><div class="rot270">31</div></td>
+				<td id="cell34" class="red"><div class="rot270">34</div></td>
+				<td class="le"><div class="rot270">2-1</div></td>
+			</tr>
+			<tr>
+				<td rowspan="2">&nbsp;</td>
+				<td class="lor" colspan="4">1 st 12</td>
+				<td class="lor" colspan="4">2 nd 12</td>
+				<td class="lor flor" colspan="4">3 rd 12</td>
+				<td>&nbsp;</td>
+			</tr>
+			<tr>
+				<td class="lor" colspan="2">1-18</td>
+				<td class="lor" colspan="2">Even</td>
+				<td colspan="2" class="a_red">Red</td>
+				<td colspan="2" class="a_black">Black</td>
+				<td class="lor" colspan="2">Odd</td>
+				<td class="lor flor" colspan="2">19-36</td>
+			</tr>
+		</table>
+		<table class="downPC" border="0" cellspacing="0" cellpadding="0">
+			<tr>
+				<td id="col1"><div class="dbtn">&nbsp;</div>COULUMN 1</td>
+				<td id="col2"><div class="dbtn">&nbsp;</div>COULUMN 2</td>
+				<td id="col3"><div class="dbtn">&nbsp;</div>COULUMN 3</td>
+				<td>&nbsp;</td>
+			</tr>
+			<tr>
+				<td id="br1"><div class="dbtn">&nbsp;</div>BET ROW 1</td>
+				<td id="br2"><div class="dbtn">&nbsp;</div>BET ROW 2</td>
+				<td id="br3"><div class="dbtn">&nbsp;</div>BET ROW 3</td>
+				<td id="br4"><div class="dbtn">&nbsp;</div>BET ROW 4</td>
+			</tr>
+			<tr>
+				<td id="ibr1"><div class="dbtn">&nbsp;</div>1 ST 12</td>
+				<td id="ibr2"><div class="dbtn">&nbsp;</div>2<sup>nd</sup> 12</td>
+				<td id="ibr3"><div class="dbtn">&nbsp;</div>3<sup>Rd</sup> 12</td>
+				<td>&nbsp;</td>
+			</tr>
+		</table>
+		</div>
+	</div>
+	</body>
 </html>
